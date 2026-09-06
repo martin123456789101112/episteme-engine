@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Episteme Engine - Red de Nodos Epistemológica</title>
+  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 20px; }
+    h1 { text-align: center; color: #38bdf8; margin: 0 0 5px 0; font-size: 1.8rem; }
+    p.subtitle { text-align: center; color: #94a3b8; margin: 0 0 20px 0; font-size: 0.95rem; }
+    .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
+    input { padding: 12px 16px; width: 360px; max-width: 100%; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: white; outline: none; font-size: 0.95rem; }
+    button { padding: 12px 24px; background: #38bdf8; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #0f172a; font-size: 0.95rem; transition: background 0.2s; }
+    button:hover { background: #7dd3fc; }
+    #network { width: 100%; height: 70vh; border: 1px solid #334155; border-radius: 8px; background: #0b0f19; }
+  </style>
+</head>
+<body>
+
+  <h1>EPISTEME ENGINE</h1>
+  <p class="subtitle">Simulador de la Teoría del Conocimiento mediante Nodos Interactivos</p>
+
+  <div class="controls">
+    <input type="text" id="userInput" value="Veo una manzana roja en la mesa" placeholder="Escribe una percepción o premisa...">
+    <button onclick="procesarEpistemologia()">Analizar en Nodos</button>
+  </div>
+
+  <div id="network"></div>
+
+  <script>
+    let network = null;
+
+    async function procesarEpistemologia() {
+      const premisa = document.getElementById('userInput').value;
+
+      try {
+        const response = await fetch('/api/analizar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ premisa })
+        });
+
+        const data = await response.json();
+
+        const nodes = new vis.DataSet([
+          { id: 1, label: 'PREMISA:\n' + premisa, color: '#f43f5e', shape: 'ellipse', font: { color: '#ffffff', size: 14, face: 'sans-serif' } },
+          { id: 2, label: 'Sócrates\n(Antigua)', color: '#38bdf8', font: { color: '#ffffff' } },
+          { id: 3, label: 'Platón\n(Antigua)', color: '#38bdf8', font: { color: '#ffffff' } },
+          { id: 4, label: 'Aristóteles\n(Antigua)', color: '#38bdf8', font: { color: '#ffffff' } },
+          { id: 5, label: 'San Agustín\n(Medieval)', color: '#a855f7', font: { color: '#ffffff' } },
+          { id: 6, label: 'Descartes\n(Moderna/Racionalismo)', color: '#f59e0b', font: { color: '#ffffff' } },
+          { id: 7, label: 'Locke\n(Moderna/Empirismo)', color: '#f59e0b', font: { color: '#ffffff' } },
+          { id: 8, label: 'Kant\n(Contemporánea)', color: '#10b981', font: { color: '#ffffff' } },
+          { id: 9, label: 'Nietzsche\n(Contemporánea)', color: '#10b981', font: { color: '#ffffff' } }
+        ]);
+
+        const edges = new vis.DataSet([
+          { from: 1, to: 2, label: data.socrates },
+          { from: 1, to: 3, label: data.platon },
+          { from: 1, to: 4, label: data.aristoteles },
+          { from: 1, to: 5, label: data.agustin },
+          { from: 1, to: 6, label: data.descartes },
+          { from: 1, to: 7, label: data.locke },
+          { from: 1, to: 8, label: data.kant },
+          { from: 1, to: 9, label: data.nietzsche }
+        ]);
+
+        const container = document.getElementById('network');
+
+        if (network !== null) { network.destroy(); }
+
+        network = new vis.Network(container, { nodes, edges }, {
+          physics: { enabled: true, barnesHut: { springLength: 220, gravitationalConstant: -3000 } },
+          edges: { font: { fill: '#cbd5e1', size: 11, align: 'horizontal' }, color: { color: '#475569' } }
+        });
+
+      } catch (err) {
+        console.error("Error consultando el servidor:", err);
+      }
+    }
+
+    window.onload = procesarEpistemologia;
+  </script>
+</body>
+</html>
