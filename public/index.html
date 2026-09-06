@@ -15,6 +15,20 @@
     button { padding: 12px 24px; background: #38bdf8; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #0f172a; font-size: 0.95rem; transition: background 0.2s; }
     button:hover { background: #7dd3fc; }
     #network { width: 100%; height: 72vh; border: 1px solid #334155; border-radius: 8px; background: #0b0f19; }
+    
+    /* Estilo para los tooltips flotantes */
+    div.vis-tooltip {
+      position: absolute;
+      background-color: #1e293b !important;
+      color: #f8fafc !important;
+      border: 1px solid #38bdf8 !important;
+      border-radius: 8px !important;
+      padding: 10px 14px !important;
+      font-family: system-ui, sans-serif !important;
+      font-size: 0.9rem !important;
+      max-width: 280px !important;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    }
   </style>
 </head>
 <body>
@@ -32,19 +46,6 @@
   <script>
     let network = null;
 
-    // Función auxiliar para insertar saltos de línea cada N palabras y evitar que las etiquetas se monten
-    function formatearTexto(texto, maxPalabras = 6) {
-      const palabras = texto.split(' ');
-      let resultado = '';
-      for (let i = 0; i < palabras.length; i++) {
-        resultado += palabras[i] + ' ';
-        if ((i + 1) % maxPalabras === 0) {
-          resultado += '\n';
-        }
-      }
-      return resultado.trim();
-    }
-
     async function procesarEpistemologia() {
       const premisa = document.getElementById('userInput').value;
 
@@ -57,27 +58,29 @@
 
         const data = await response.json();
 
+        // Nodos con etiquetas limpias y la explicación detallada en el campo 'title' (tooltip al pasar el cursor)
         const nodes = new vis.DataSet([
-          { id: 1, label: 'PREMISA:\n' + premisa, color: '#f43f5e', shape: 'ellipse', font: { color: '#ffffff', size: 14, face: 'sans-serif' } },
-          { id: 2, label: 'Sócrates\n(Antigua)', color: '#38bdf8', font: { color: '#ffffff' } },
-          { id: 3, label: 'Platón\n(Antigua)', color: '#38bdf8', font: { color: '#ffffff' } },
-          { id: 4, label: 'Aristóteles\n(Antigua)', color: '#38bdf8', font: { color: '#ffffff' } },
-          { id: 5, label: 'San Agustín\n(Medieval)', color: '#a855f7', font: { color: '#ffffff' } },
-          { id: 6, label: 'Descartes\n(Moderna)', color: '#f59e0b', font: { color: '#ffffff' } },
-          { id: 7, label: 'Locke\n(Moderna)', color: '#f59e0b', font: { color: '#ffffff' } },
-          { id: 8, label: 'Kant\n(Contemporánea)', color: '#10b981', font: { color: '#ffffff' } },
-          { id: 9, label: 'Nietzsche\n(Contemporánea)', color: '#10b981', font: { color: '#ffffff' } }
+          { id: 1, label: 'PREMISA:\n' + premisa, color: '#f43f5e', shape: 'ellipse', font: { color: '#ffffff', size: 14 } },
+          { id: 2, label: 'Sócrates\n(Antigua)', title: data.socrates, color: '#38bdf8', font: { color: '#ffffff' } },
+          { id: 3, label: 'Platón\n(Antigua)', title: data.platon, color: '#38bdf8', font: { color: '#ffffff' } },
+          { id: 4, label: 'Aristóteles\n(Antigua)', title: data.aristoteles, color: '#38bdf8', font: { color: '#ffffff' } },
+          { id: 5, label: 'San Agustín\n(Medieval)', title: data.agustin, color: '#a855f7', font: { color: '#ffffff' } },
+          { id: 6, label: 'Descartes\n(Moderna)', title: data.descartes, color: '#f59e0b', font: { color: '#ffffff' } },
+          { id: 7, label: 'Locke\n(Moderna)', title: data.locke, color: '#f59e0b', font: { color: '#ffffff' } },
+          { id: 8, label: 'Kant\n(Contemporánea)', title: data.kant, color: '#10b981', font: { color: '#ffffff' } },
+          { id: 9, label: 'Nietzsche\n(Contemporánea)', title: data.nietzsche, color: '#10b981', font: { color: '#ffffff' } }
         ]);
 
+        // Conexiones limpias sin texto gigante estorbando en medio
         const edges = new vis.DataSet([
-          { from: 1, to: 2, label: formatearTexto(data.socrates) },
-          { from: 1, to: 3, label: formatearTexto(data.platon) },
-          { from: 1, to: 4, label: formatearTexto(data.aristoteles) },
-          { from: 1, to: 5, label: formatearTexto(data.agustin) },
-          { from: 1, to: 6, label: formatearTexto(data.descartes) },
-          { from: 1, to: 7, label: formatearTexto(data.locke) },
-          { from: 1, to: 8, label: formatearTexto(data.kant) },
-          { from: 1, to: 9, label: formatearTexto(data.nietzsche) }
+          { from: 1, to: 2, title: data.socrates },
+          { from: 1, to: 3, title: data.platon },
+          { from: 1, to: 4, title: data.aristoteles },
+          { from: 1, to: 5, title: data.agustin },
+          { from: 1, to: 6, title: data.descartes },
+          { from: 1, to: 7, title: data.locke },
+          { from: 1, to: 8, title: data.kant },
+          { from: 1, to: 9, title: data.nietzsche }
         ]);
 
         const container = document.getElementById('network');
@@ -88,21 +91,19 @@
           physics: {
             enabled: true,
             barnesHut: {
-              gravitationalConstant: -12000, // Fuerza alta para separar bien los nodos
-              centralGravity: 0.2,
-              springLength: 300,            // Mayor distancia en las líneas
+              gravitationalConstant: -15000, // Fuerza que repele y separa bien los nodos
+              centralGravity: 0.1,
+              springLength: 220,             // Longitud de las conexiones
               springConstant: 0.05
             }
           },
           edges: {
-            font: {
-              fill: '#e2e8f0',
-              size: 10,
-              align: 'horizontal',
-              background: '#0b0f19'         // Fondo oscuro tras el texto para evitar traslapes
-            },
-            color: { color: '#334155' },
-            width: 1.5
+            color: { color: '#38bdf8', highlight: '#7dd3fc' },
+            width: 2,
+            smooth: { type: 'continuous' }
+          },
+          interaction: {
+            hover: true // Habilita el efecto de pasar el ratón
           }
         };
 
