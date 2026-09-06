@@ -29,24 +29,25 @@ app.post('/api/analizar', async (req, res) => {
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     const promptSystem = `
-Actúa como un profesor experto en epistemología e historia de la filosofía. 
-Analiza de forma ultra-específica la siguiente premisa planteada por el usuario: "${premisa}".
+Actúa como un motor epistemológico interactivo. Interpreta la siguiente premisa planteada por el usuario: "${premisa}".
 
-Tu objetivo es explicar la posición epistemológica de 8 filósofos frente a ESTA premisa en particular. 
-Evita frases genéricas o resúmenes de libros. Conecta directamente la premisa con sus conceptos clave.
+Tu tarea es hacer que cada uno de los siguientes 8 filósofos reaccione e interprete ESTA PREMISA ESPECÍFICA en PRIMERA PERSONA o mediante su razonamiento directo. 
+IMPORTANTE:
+- NO digas cosas como "Sócrates cuestionaría esto mediante la mayéutica..." o "Platón dice que...".
+- En su lugar, haz que el filósofo HAGA el cuestionamiento o el análisis directamente.
+- Aplica rigurosamente la doctrina y el lenguaje técnico de cada uno adaptado a la frase.
 
-Devuelve EXCLUSIVAMENTE un objeto JSON válido (sin bloques markdown de código de tipo \`\`\`json) con la siguiente estructura y requisitos para cada uno:
+Instrucciones por filósofo:
+1. "socrates": Haz la pregunta mayéutica directa e incisiva que pone en duda lo que el usuario da por sentado sobre su premisa. (Ej: "¿Afirmas que ves X, pero acaso tus ojos te muestran la esencia de X o solo un reflejo efímero?").
+2. "platon": Explica directamente cómo la premisa es una mera sombra (doxa/mundo sensible) y cuál es la Idea eterna e inteligible a la que intenta aspirar.
+3. "aristoteles": Analiza directamente las causas (material, formal, eficiente, final) o el proceso de abstracción empírica a partir de la experiencia sensible de la premisa.
+4. "agustin": Explica directamente cómo la percepción humana de la premisa es falible y solo alcanza la verdad suprema mediante la iluminación divina.
+5. "descartes": Aplica directamente la duda metódica sobre la premisa: ¿puedes dudar de esto? ¿Es una intuición clara y distinta o un engaño de los sentidos/genio maligno?
+6. "locke": Descompón la premisa en ideas simples de sensación e ideas complejas de reflexión, demostrando cómo la mente era una 'tabla rasa' antes de esta experiencia.
+7. "kant": Examina directamente la premisa usando las intuiciones a priori (espacio y tiempo) y las categorías del entendimiento (demostrando que conocemos el fenómeno, no el noúmeno).
+8. "nietzsche": Destruye o deconstruye la premisa con tono crítico y punzante, exponiéndola como una mera metáfora del lenguaje, una perspectiva o una construcción de la voluntad de poder.
 
-1. "socrates": Aplica la mayéutica. Plantea una pregunta punzante directa que desmonte los supuestos de la premisa.
-2. "platon": Explica por qué esta premisa pertenece al mundo sensible (doxa/sombra) e indica cuál sería su Idea verdadera en el mundo inteligible.
-3. "aristoteles": Analiza la premisa mediante la experiencia sensible, las causas (material, formal, eficiente, final) o la abstracción empírica.
-4. "agustin": Relaciona la premisa con la fe, la iluminación divina y la falibilidad de la sensación humana sin la verdad de Dios.
-5. "descartes": Aplica la duda metódica. Cuestiona si los sentidos o un genio maligno podrían estar engañando al afirmar esta premisa.
-6. "locke": Explica cómo esta premisa se construye a partir de ideas simples de la sensación e ideas complejas de la reflexión (tabla rasa).
-7. "kant": Analiza los juicios sintéticos a priori, las intuiciones puras del espacio/tiempo y las categorías del entendimiento aplicadas a esta premisa (fenómeno vs. noúmeno).
-8. "nietzsche": Critica la premisa como una construcción del lenguaje, una perspectiva subjetiva o una manifestación de la voluntad de poder.
-
-Responde ÚNICAMENTE con el objeto JSON estructurado así:
+Devuelve EXCLUSIVAMENTE un objeto JSON válido (sin bloques markdown de código de tipo \`\`\`json) estructurado así:
 {
   "socrates": "...",
   "platon": "...",
@@ -62,7 +63,7 @@ Responde ÚNICAMENTE con el objeto JSON estructurado así:
     const result = await model.generateContent(promptSystem);
     const textResponse = result.response.text().trim();
     
-    // Limpieza de formato si el modelo incluye bloques ```json
+    // Limpieza del bloque JSON
     const cleanedJson = textResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
     const data = JSON.parse(cleanedJson);
 
