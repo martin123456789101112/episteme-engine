@@ -15,7 +15,6 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Configuración de Google Gemini API
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.post('/api/analizar', async (req, res) => {
@@ -31,39 +30,41 @@ app.post('/api/analizar', async (req, res) => {
     const promptSystem = `
 Actúa como un motor epistemológico interactivo. Interpreta la siguiente premisa planteada por el usuario: "${premisa}".
 
-Tu tarea es hacer que cada uno de los siguientes 8 filósofos reaccione e interprete ESTA PREMISA ESPECÍFICA en PRIMERA PERSONA o mediante su razonamiento directo. 
-IMPORTANTE:
-- NO digas cosas como "Sócrates cuestionaría esto mediante la mayéutica..." o "Platón dice que...".
-- En su lugar, haz que el filósofo HAGA el cuestionamiento o el análisis directamente.
-- Aplica rigurosamente la doctrina y el lenguaje técnico de cada uno adaptado a la frase.
+Tu tarea es hacer que cada uno de los 18 filósofos de la lista reaccione e interprete ESTA PREMISA ESPECÍFICA en PRIMERA PERSONA o mediante su razonamiento directo (máximo 2-3 frases breves por filósofo).
 
-Instrucciones por filósofo:
-1. "socrates": Haz la pregunta mayéutica directa e incisiva que pone en duda lo que el usuario da por sentado sobre su premisa. (Ej: "¿Afirmas que ves X, pero acaso tus ojos te muestran la esencia de X o solo un reflejo efímero?").
-2. "platon": Explica directamente cómo la premisa es una mera sombra (doxa/mundo sensible) y cuál es la Idea eterna e inteligible a la que intenta aspirar.
-3. "aristoteles": Analiza directamente las causas (material, formal, eficiente, final) o el proceso de abstracción empírica a partir de la experiencia sensible de la premisa.
-4. "agustin": Explica directamente cómo la percepción humana de la premisa es falible y solo alcanza la verdad suprema mediante la iluminación divina.
-5. "descartes": Aplica directamente la duda metódica sobre la premisa: ¿puedes dudar de esto? ¿Es una intuición clara y distinta o un engaño de los sentidos/genio maligno?
-6. "locke": Descompón la premisa en ideas simples de sensación e ideas complejas de reflexión, demostrando cómo la mente era una 'tabla rasa' antes de esta experiencia.
-7. "kant": Examina directamente la premisa usando las intuiciones a priori (espacio y tiempo) y las categorías del entendimiento (demostrando que conocemos el fenómeno, no el noúmeno).
-8. "nietzsche": Destruye o deconstruye la premisa con tono crítico y punzante, exponiéndola como una mera metáfora del lenguaje, una perspectiva o una construcción de la voluntad de poder.
+REGLAS CRÍTICAS:
+- NO digas cosas como "Sócrates cuestionaría esto mediante..." o "Platón dice que...".
+- Haz que cada filósofo HAGA su planteamiento directamente sobre la premisa ingresada.
+- Utiliza su lenguaje técnico exacto.
 
-Devuelve EXCLUSIVAMENTE un objeto JSON válido (sin bloques markdown de código de tipo \`\`\`json) estructurado así:
-{
-  "socrates": "...",
-  "platon": "...",
-  "aristoteles": "...",
-  "agustin": "...",
-  "descartes": "...",
-  "locke": "...",
-  "kant": "...",
-  "nietzsche": "..."
-}
+Lista de los 18 filósofos:
+1. "socrates": Cuestionamiento mayéutico directo.
+2. "platon": Mundo sensible (doxa/sombra) vs Idea inteligible.
+3. "aristoteles": Abstracción empírica y causas (material, formal, etc.).
+4. "agustin": Iluminación divina y fe frente a la falibilidad de los sentidos.
+5. "escoto": Duns Escoto; distinción formal y voluntarismo cognitivo.
+6. "ockam": Guillermo de Ockham; nominalismo y la navaja de Ockham.
+7. "descartes": Duda metódica, certezas claras y distintas.
+8. "spinoza": Sustancia única, Dios o la Naturaleza (Pantenteísmo epistemológico).
+9. "leibniz": Mónadas e ideas innatas/armonía preestablecida.
+10. "hobbes": Materialismo, empirismo mecanicista y sensación.
+11. "locke": Tabula rasa, ideas simples de sensación y complejas de reflexión.
+12. "berkeley": Inmaterialismo; "ser es ser percibido" (Esse est percipi).
+13. "hume": Impresiones, ideas y escepticismo sobre la causalidad.
+14. "husserl": Fenomenología y epojé (reducción fenomenológica de la conciencia).
+15. "heidegger": Dasein, el Ser-en-el-mundo y la vivencia existencial de la premisa.
+16. "kant": Juicios a priori, espacio/tiempo y fenómeno vs noúmeno.
+17. "comte": Positivismo, los tres estadios y el hecho científico observable.
+18. "nietzsche": Voluntad de poder, metáfora del lenguaje y perspectiva.
+19. "weber": Max Weber; "Verstehen" (comprensión interpretativa del sentido social).
+
+Devuelve EXCLUSIVAMENTE un objeto JSON válido (sin bloques markdown de código de tipo \`\`\`json) estructurado con estas 19 llaves exactas:
+"socrates", "platon", "aristoteles", "agustin", "escoto", "ockam", "descartes", "spinoza", "leibniz", "hobbes", "locke", "berkeley", "hume", "husserl", "heidegger", "kant", "comte", "nietzsche", "weber".
 `;
 
     const result = await model.generateContent(promptSystem);
     const textResponse = result.response.text().trim();
     
-    // Limpieza del bloque JSON
     const cleanedJson = textResponse.replace(/^```json\s*/, '').replace(/\s*```$/, '');
     const data = JSON.parse(cleanedJson);
 
