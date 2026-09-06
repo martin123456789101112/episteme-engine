@@ -16,7 +16,6 @@
     button:hover { background: #7dd3fc; }
     #network { width: 100%; height: 72vh; border: 1px solid #334155; border-radius: 8px; background: #0b0f19; }
     
-    /* Estilo para los tooltips flotantes */
     div.vis-tooltip {
       position: absolute;
       background-color: #1e293b !important;
@@ -26,8 +25,8 @@
       padding: 10px 14px !important;
       font-family: system-ui, sans-serif !important;
       font-size: 0.9rem !important;
-      max-width: 280px !important;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+      max-width: 300px !important;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.6) !important;
     }
   </style>
 </head>
@@ -58,7 +57,7 @@
 
         const data = await response.json();
 
-        // Nodos con etiquetas limpias y la explicación detallada en el campo 'title' (tooltip al pasar el cursor)
+        // Nodos con explicaciones únicamente en la propiedad 'title' (tooltip)
         const nodes = new vis.DataSet([
           { id: 1, label: 'PREMISA:\n' + premisa, color: '#f43f5e', shape: 'ellipse', font: { color: '#ffffff', size: 14 } },
           { id: 2, label: 'Sócrates\n(Antigua)', title: data.socrates, color: '#38bdf8', font: { color: '#ffffff' } },
@@ -71,7 +70,7 @@
           { id: 9, label: 'Nietzsche\n(Contemporánea)', title: data.nietzsche, color: '#10b981', font: { color: '#ffffff' } }
         ]);
 
-        // Conexiones limpias sin texto gigante estorbando en medio
+        // Edges totalmente limpios (sin propiedad label)
         const edges = new vis.DataSet([
           { from: 1, to: 2, title: data.socrates },
           { from: 1, to: 3, title: data.platon },
@@ -91,10 +90,10 @@
           physics: {
             enabled: true,
             barnesHut: {
-              gravitationalConstant: -15000, // Fuerza que repele y separa bien los nodos
+              gravitationalConstant: -18000,
               centralGravity: 0.1,
-              springLength: 220,             // Longitud de las conexiones
-              springConstant: 0.05
+              springLength: 220,
+              springConstant: 0.04
             }
           },
           edges: {
@@ -103,7 +102,7 @@
             smooth: { type: 'continuous' }
           },
           interaction: {
-            hover: true // Habilita el efecto de pasar el ratón
+            hover: true
           }
         };
 
