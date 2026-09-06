@@ -146,6 +146,7 @@
   <script>
     let network = null;
 
+    // Función para formatear el tooltip flotante
     function formatearTooltip(texto) {
       const container = document.createElement('div');
       container.style.maxWidth = '240px';
@@ -153,6 +154,24 @@
       container.style.wordWrap = 'break-word';
       container.innerText = texto;
       return container;
+    }
+
+    // Función para insertar saltos de línea en el texto del nodo central
+    function envolverTexto(str, maxAncho = 30) {
+      const palabras = str.split(' ');
+      let lineas = [];
+      let lineaActual = '';
+
+      palabras.forEach(palabra => {
+        if ((lineaActual + palabra).length > maxAncho) {
+          lineas.push(lineaActual.trim());
+          lineaActual = palabra + ' ';
+        } else {
+          lineaActual += palabra + ' ';
+        }
+      });
+      lineas.push(lineaActual.trim());
+      return lineas.join('\n');
     }
 
     async function procesarEpistemologia() {
@@ -167,7 +186,7 @@
 
         const data = await response.json();
 
-        // Renderizar el Panel Lateral (Respuesta Escrita)
+        // Renderizar el Panel Lateral
         const taskContent = document.getElementById('taskContent');
         taskContent.innerHTML = `
           <div class="philosopher-card" style="border-color: #f43f5e;"><strong>Premisa:</strong> "${premisa}"</div>
@@ -181,9 +200,20 @@
           <div class="philosopher-card" style="border-color: #10b981;"><strong>Nietzsche:</strong> ${data.nietzsche}</div>
         `;
 
-        // Renderizar la Red de Nodos
+        // Formatear premisa para el nodo central
+        const premisaFormateada = envolverTexto(premisa, 32);
+
+        // Renderizar Nodos con el centro adaptativo (shape: 'box')
         const nodes = new vis.DataSet([
-          { id: 1, label: 'PREMISA:\n' + premisa, color: '#f43f5e', shape: 'ellipse', font: { color: '#ffffff', size: 13 } },
+          { 
+            id: 1, 
+            label: 'PREMISA:\n' + premisaFormateada, 
+            color: { background: '#f43f5e', border: '#fda4af' }, 
+            shape: 'box', 
+            margin: 12,
+            shapeProperties: { borderRadius: 8 },
+            font: { color: '#ffffff', size: 13, align: 'center' } 
+          },
           { id: 2, label: 'Sócrates\n(Antigua)', title: formatearTooltip(data.socrates), color: '#38bdf8', font: { color: '#ffffff' } },
           { id: 3, label: 'Platón\n(Antigua)', title: formatearTooltip(data.platon), color: '#38bdf8', font: { color: '#ffffff' } },
           { id: 4, label: 'Aristóteles\n(Antigua)', title: formatearTooltip(data.aristoteles), color: '#38bdf8', font: { color: '#ffffff' } },
@@ -208,9 +238,9 @@
           physics: {
             enabled: true,
             barnesHut: {
-              gravitationalConstant: -14000,
+              gravitationalConstant: -16000,
               centralGravity: 0.1,
-              springLength: 180,
+              springLength: 200,
               springConstant: 0.04
             }
           },
