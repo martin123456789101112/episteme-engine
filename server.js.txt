@@ -1,0 +1,38 @@
+const express = require('express');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+
+app.use(cors());
+app.use(express.json());
+
+// Servir la interfaz del frontend desde la carpeta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
+
+// Ruta de salud usada para UptimeRobot
+app.get('/health', (req, res) => {
+  res.status(200).send('Servidor activo 24/7');
+});
+
+// Endpoint que responde la tarea analizada por filósofos
+app.post('/api/analizar', (req, res) => {
+  const { premisa } = req.body;
+  const texto = premisa || "la realidad";
+
+  res.json({
+    socrates: `Sócrates: ¿Estás seguro de que entiendes "${texto}"? Cuestiónalo mediante la mayéutica.`,
+    platon: `Platón: "${texto}" en el mundo físico es solo una sombra. El verdadero conocimiento de su idea está en el alma.`,
+    aristoteles: `Aristóteles: Tu conocimiento de "${texto}" inició en tus sentidos y luego tu mente abstrajo su esencia.`,
+    agustin: `San Agustín: Para comprender las verdades sobre "${texto}" requieres de la Iluminación Divina.`,
+    descartes: `Descartes: Dudas de tus sentidos sobre "${texto}". La única certeza indudable es que estás pensándolo.`,
+    locke: `Locke: Naciendo con mente en blanco, la experiencia y sensación grabaron "${texto}" en tu tabla rasa.`,
+    kant: `Kant: Percibiste datos de "${texto}", pero las formas a priori (espacio/tiempo) de tu mente los organizaron.`,
+    nietzsche: `Nietzsche: "${texto}" no es una verdad objetiva; es una interpretación creada por tu voluntad de poder.`
+  });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor ejecutándose en el puerto ${PORT}`);
+});
