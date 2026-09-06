@@ -13,7 +13,24 @@
       font-family: system-ui, -apple-system, sans-serif; 
       margin: 0; 
       padding: 20px; 
+      position: relative;
     }
+    
+    /* Etiqueta con tu nombre en la esquina superior derecha */
+    .author-badge {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      background: #1e293b;
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+
     h1 { text-align: center; color: #38bdf8; margin: 0 0 5px 0; font-size: 1.8rem; }
     p.subtitle { text-align: center; color: #94a3b8; margin: 0 0 20px 0; font-size: 0.95rem; }
     
@@ -119,6 +136,9 @@
 </head>
 <body>
 
+  <!-- Firma en la esquina superior -->
+  <div class="author-badge">sepulveda celeita martin santiago</div>
+
   <h1>EPISTEME ENGINE</h1>
   <p class="subtitle">Simulador de la Teoría del Conocimiento mediante Nodos Interactivos</p>
 
@@ -153,7 +173,6 @@
       return container;
     }
 
-    // Recorta el texto si es demasiado largo para que el nodo central no se deforme
     function acortarTextoNodo(str, maxLen = 35) {
       if (str.length <= maxLen) return str;
       return str.substring(0, maxLen) + '...';
@@ -171,7 +190,6 @@
 
         const data = await response.json();
 
-        // 1. Mostrar premisa COMPLETA en el panel derecho de la tarea
         const taskContent = document.getElementById('taskContent');
         taskContent.innerHTML = `
           <div class="philosopher-card" style="border-color: #f43f5e;"><strong>Premisa Analizada:</strong> "${premisa}"</div>
@@ -185,7 +203,6 @@
           <div class="philosopher-card" style="border-color: #10b981;"><strong>Nietzsche:</strong> ${data.nietzsche}</div>
         `;
 
-        // 2. Nodo central con etiqueta acortada + tooltip con la premisa completa al pasar el mouse
         const labelCentro = 'PREMISA:\n' + acortarTextoNodo(premisa, 35);
 
         const nodes = new vis.DataSet([
@@ -219,7 +236,6 @@
 
         if (network !== null) { network.destroy(); }
 
-        // Física ajustada para dar espacio amplio al nodo central
         const options = {
           physics: {
             enabled: true,
