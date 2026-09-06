@@ -20,7 +20,7 @@
     .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
     input { 
       padding: 12px 16px; 
-      width: 380px; 
+      width: 420px; 
       border-radius: 6px; 
       border: 1px solid #334155; 
       background: #1e293b; 
@@ -41,7 +41,7 @@
     }
     button:hover { background: #7dd3fc; }
 
-    /* Contenedor principal de dos columnas */
+    /* Layout principal de dos columnas */
     .app-layout { 
       display: flex; 
       gap: 15px; 
@@ -49,7 +49,7 @@
       height: 75vh; 
     }
 
-    /* Simulador de Nodos (Lado Izquierdo) */
+    /* Red de Nodos */
     #network { 
       flex: 1; 
       border: 1px solid #334155; 
@@ -58,9 +58,9 @@
       height: 100%; 
     }
 
-    /* Panel Lateral de Tarea (Lado Derecho) */
+    /* Panel Lateral de Tarea */
     .task-panel { 
-      width: 350px; 
+      width: 360px; 
       background: #1e293b; 
       border: 1px solid #334155; 
       border-radius: 8px; 
@@ -97,7 +97,7 @@
       margin-bottom: 3px; 
     }
 
-    /* Estilo del Tooltip flotante dentro de la red */
+    /* Tooltip personalizado para Vis.js */
     div.vis-tooltip {
       position: absolute !important;
       background-color: #1e293b !important;
@@ -128,10 +128,8 @@
   </div>
 
   <div class="app-layout">
-    <!-- Area del Simulador -->
     <div id="network"></div>
 
-    <!-- Panel Lateral con la Respuesta -->
     <div class="task-panel">
       <h2>
         Respuesta de la Tarea 
@@ -146,7 +144,6 @@
   <script>
     let network = null;
 
-    // Función para formatear el tooltip flotante
     function formatearTooltip(texto) {
       const container = document.createElement('div');
       container.style.maxWidth = '240px';
@@ -156,22 +153,10 @@
       return container;
     }
 
-    // Función para insertar saltos de línea en el texto del nodo central
-    function envolverTexto(str, maxAncho = 30) {
-      const palabras = str.split(' ');
-      let lineas = [];
-      let lineaActual = '';
-
-      palabras.forEach(palabra => {
-        if ((lineaActual + palabra).length > maxAncho) {
-          lineas.push(lineaActual.trim());
-          lineaActual = palabra + ' ';
-        } else {
-          lineaActual += palabra + ' ';
-        }
-      });
-      lineas.push(lineaActual.trim());
-      return lineas.join('\n');
+    // Recorta el texto si es demasiado largo para que el nodo central no se deforme
+    function acortarTextoNodo(str, maxLen = 35) {
+      if (str.length <= maxLen) return str;
+      return str.substring(0, maxLen) + '...';
     }
 
     async function procesarEpistemologia() {
@@ -186,10 +171,10 @@
 
         const data = await response.json();
 
-        // Renderizar el Panel Lateral
+        // 1. Mostrar premisa COMPLETA en el panel derecho de la tarea
         const taskContent = document.getElementById('taskContent');
         taskContent.innerHTML = `
-          <div class="philosopher-card" style="border-color: #f43f5e;"><strong>Premisa:</strong> "${premisa}"</div>
+          <div class="philosopher-card" style="border-color: #f43f5e;"><strong>Premisa Analizada:</strong> "${premisa}"</div>
           <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Sócrates:</strong> ${data.socrates}</div>
           <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Platón:</strong> ${data.platon}</div>
           <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Aristóteles:</strong> ${data.aristoteles}</div>
@@ -200,19 +185,19 @@
           <div class="philosopher-card" style="border-color: #10b981;"><strong>Nietzsche:</strong> ${data.nietzsche}</div>
         `;
 
-        // Formatear premisa para el nodo central
-        const premisaFormateada = envolverTexto(premisa, 32);
+        // 2. Nodo central con etiqueta acortada + tooltip con la premisa completa al pasar el mouse
+        const labelCentro = 'PREMISA:\n' + acortarTextoNodo(premisa, 35);
 
-        // Renderizar Nodos con el centro adaptativo (shape: 'box')
         const nodes = new vis.DataSet([
           { 
             id: 1, 
-            label: 'PREMISA:\n' + premisaFormateada, 
+            label: labelCentro, 
+            title: formatearTooltip("Premisa completa:\n" + premisa),
             color: { background: '#f43f5e', border: '#fda4af' }, 
             shape: 'box', 
             margin: 12,
             shapeProperties: { borderRadius: 8 },
-            font: { color: '#ffffff', size: 13, align: 'center' } 
+            font: { color: '#ffffff', size: 13, bold: true, align: 'center' } 
           },
           { id: 2, label: 'Sócrates\n(Antigua)', title: formatearTooltip(data.socrates), color: '#38bdf8', font: { color: '#ffffff' } },
           { id: 3, label: 'Platón\n(Antigua)', title: formatearTooltip(data.platon), color: '#38bdf8', font: { color: '#ffffff' } },
@@ -234,13 +219,14 @@
 
         if (network !== null) { network.destroy(); }
 
+        // Física ajustada para dar espacio amplio al nodo central
         const options = {
           physics: {
             enabled: true,
             barnesHut: {
-              gravitationalConstant: -16000,
+              gravitationalConstant: -22000,
               centralGravity: 0.1,
-              springLength: 200,
+              springLength: 220,
               springConstant: 0.04
             }
           },
