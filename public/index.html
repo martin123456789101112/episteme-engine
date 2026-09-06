@@ -7,38 +7,97 @@
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <style>
     * { box-sizing: border-box; }
-    body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding: 20px; }
+    body { 
+      background-color: #0f172a; 
+      color: #f8fafc; 
+      font-family: system-ui, -apple-system, sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+    }
     h1 { text-align: center; color: #38bdf8; margin: 0 0 5px 0; font-size: 1.8rem; }
     p.subtitle { text-align: center; color: #94a3b8; margin: 0 0 20px 0; font-size: 0.95rem; }
-    .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; flex-wrap: wrap; }
-    input { padding: 12px 16px; width: 360px; max-width: 100%; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: white; outline: none; font-size: 0.95rem; }
-    button { padding: 12px 24px; background: #38bdf8; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #0f172a; font-size: 0.95rem; transition: background 0.2s; }
-    button:hover { background: #7dd3fc; }
-    .btn-secondary { background: #334155; color: #f8fafc; }
-    .btn-secondary:hover { background: #475569; }
-
-    /* Layout principal para alojar el mapa y el menú de tareas */
-    .main-container { display: flex; gap: 15px; width: 100%; height: 72vh; }
-    #network { flex: 1; border: 1px solid #334155; border-radius: 8px; background: #0b0f19; height: 100%; }
-
-    /* Panel del menú de la tarea */
-    #taskPanel {
-      width: 380px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 18px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
+    
+    .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
+    input { 
+      padding: 12px 16px; 
+      width: 380px; 
+      border-radius: 6px; 
+      border: 1px solid #334155; 
+      background: #1e293b; 
+      color: white; 
+      outline: none; 
+      font-size: 0.95rem; 
     }
-    #taskPanel.hidden { display: none; }
-    #taskPanel h2 { color: #38bdf8; font-size: 1.2rem; margin: 0 0 10px 0; border-bottom: 1px solid #334155; padding-bottom: 8px; }
-    .philosopher-item { background: #0f172a; border-left: 4px solid #38bdf8; padding: 10px 12px; border-radius: 4px; font-size: 0.88rem; line-height: 1.4; }
-    .philosopher-item strong { color: #f8fafc; display: block; margin-bottom: 4px; }
+    button { 
+      padding: 12px 24px; 
+      background: #38bdf8; 
+      border: none; 
+      border-radius: 6px; 
+      font-weight: bold; 
+      cursor: pointer; 
+      color: #0f172a; 
+      font-size: 0.95rem; 
+      transition: background 0.2s; 
+    }
+    button:hover { background: #7dd3fc; }
 
-    /* Tooltips en la red */
+    /* Contenedor principal de dos columnas */
+    .app-layout { 
+      display: flex; 
+      gap: 15px; 
+      width: 100%; 
+      height: 75vh; 
+    }
+
+    /* Simulador de Nodos (Lado Izquierdo) */
+    #network { 
+      flex: 1; 
+      border: 1px solid #334155; 
+      border-radius: 8px; 
+      background: #0b0f19; 
+      height: 100%; 
+    }
+
+    /* Panel Lateral de Tarea (Lado Derecho) */
+    .task-panel { 
+      width: 350px; 
+      background: #1e293b; 
+      border: 1px solid #334155; 
+      border-radius: 8px; 
+      padding: 16px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 12px; 
+      overflow-y: auto; 
+    }
+
+    .task-panel h2 { 
+      color: #38bdf8; 
+      font-size: 1.1rem; 
+      margin: 0 0 8px 0; 
+      border-bottom: 1px solid #334155; 
+      padding-bottom: 8px; 
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .philosopher-card { 
+      background: #0f172a; 
+      border-left: 4px solid #38bdf8; 
+      padding: 10px 12px; 
+      border-radius: 4px; 
+      font-size: 0.85rem; 
+      line-height: 1.4; 
+    }
+    
+    .philosopher-card strong { 
+      color: #f8fafc; 
+      display: block; 
+      margin-bottom: 3px; 
+    }
+
+    /* Estilo del Tooltip flotante dentro de la red */
     div.vis-tooltip {
       position: absolute !important;
       background-color: #1e293b !important;
@@ -49,7 +108,7 @@
       font-family: system-ui, sans-serif !important;
       font-size: 0.85rem !important;
       line-height: 1.4 !important;
-      max-width: 280px !important;
+      max-width: 260px !important;
       width: max-content !important;
       white-space: normal !important;
       word-break: break-word !important;
@@ -66,16 +125,20 @@
   <div class="controls">
     <input type="text" id="userInput" value="Veo una manzana roja en la mesa" placeholder="Escribe una percepción o premisa...">
     <button onclick="procesarEpistemologia()">Analizar en Nodos</button>
-    <button class="btn-secondary" onclick="toggleTaskMenu()">📋 Ver Respuesta / Tarea</button>
   </div>
 
-  <div class="main-container">
+  <div class="app-layout">
+    <!-- Area del Simulador -->
     <div id="network"></div>
 
-    <div id="taskPanel">
-      <h2>Respuesta de la Tarea</h2>
+    <!-- Panel Lateral con la Respuesta -->
+    <div class="task-panel">
+      <h2>
+        Respuesta de la Tarea 
+        <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">(Informe)</span>
+      </h2>
       <div id="taskContent">
-        <p style="color: #94a3b8; font-size: 0.9rem;">Haz clic en "Analizar en Nodos" para generar las explicaciones escritas.</p>
+        <p style="color: #94a3b8; font-size: 0.85rem;">Cargando análisis...</p>
       </div>
     </div>
   </div>
@@ -83,15 +146,9 @@
   <script>
     let network = null;
 
-    function toggleTaskMenu() {
-      const panel = document.getElementById('taskPanel');
-      panel.classList.toggle('hidden');
-      if (network) { network.redraw(); }
-    }
-
     function formatearTooltip(texto) {
       const container = document.createElement('div');
-      container.style.maxWidth = '250px';
+      container.style.maxWidth = '240px';
       container.style.whiteSpace = 'normal';
       container.style.wordWrap = 'break-word';
       container.innerText = texto;
@@ -110,23 +167,23 @@
 
         const data = await response.json();
 
-        // Renderizar menú de la tarea
+        // Renderizar el Panel Lateral (Respuesta Escrita)
         const taskContent = document.getElementById('taskContent');
         taskContent.innerHTML = `
-          <div class="philosopher-item" style="border-color: #f43f5e;"><strong>Premisa Analizada:</strong> "${premisa}"</div>
-          <div class="philosopher-item" style="border-color: #38bdf8;"><strong>Sócrates (Antigua):</strong> ${data.socrates}</div>
-          <div class="philosopher-item" style="border-color: #38bdf8;"><strong>Platón (Antigua):</strong> ${data.platon}</div>
-          <div class="philosopher-item" style="border-color: #38bdf8;"><strong>Aristóteles (Antigua):</strong> ${data.aristoteles}</div>
-          <div class="philosopher-item" style="border-color: #a855f7;"><strong>San Agustín (Medieval):</strong> ${data.agustin}</div>
-          <div class="philosopher-item" style="border-color: #f59e0b;"><strong>Descartes (Moderna/Racionalismo):</strong> ${data.descartes}</div>
-          <div class="philosopher-item" style="border-color: #f59e0b;"><strong>Locke (Moderna/Empirismo):</strong> ${data.locke}</div>
-          <div class="philosopher-item" style="border-color: #10b981;"><strong>Kant (Contemporánea):</strong> ${data.kant}</div>
-          <div class="philosopher-item" style="border-color: #10b981;"><strong>Nietzsche (Contemporánea):</strong> ${data.nietzsche}</div>
+          <div class="philosopher-card" style="border-color: #f43f5e;"><strong>Premisa:</strong> "${premisa}"</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Sócrates:</strong> ${data.socrates}</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Platón:</strong> ${data.platon}</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Aristóteles:</strong> ${data.aristoteles}</div>
+          <div class="philosopher-card" style="border-color: #a855f7;"><strong>San Agustín:</strong> ${data.agustin}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Descartes:</strong> ${data.descartes}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Locke:</strong> ${data.locke}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Kant:</strong> ${data.kant}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Nietzsche:</strong> ${data.nietzsche}</div>
         `;
 
-        // Renderizar Nodos
+        // Renderizar la Red de Nodos
         const nodes = new vis.DataSet([
-          { id: 1, label: 'PREMISA:\n' + premisa, color: '#f43f5e', shape: 'ellipse', font: { color: '#ffffff', size: 14 } },
+          { id: 1, label: 'PREMISA:\n' + premisa, color: '#f43f5e', shape: 'ellipse', font: { color: '#ffffff', size: 13 } },
           { id: 2, label: 'Sócrates\n(Antigua)', title: formatearTooltip(data.socrates), color: '#38bdf8', font: { color: '#ffffff' } },
           { id: 3, label: 'Platón\n(Antigua)', title: formatearTooltip(data.platon), color: '#38bdf8', font: { color: '#ffffff' } },
           { id: 4, label: 'Aristóteles\n(Antigua)', title: formatearTooltip(data.aristoteles), color: '#38bdf8', font: { color: '#ffffff' } },
@@ -138,14 +195,9 @@
         ]);
 
         const edges = new vis.DataSet([
-          { from: 1, to: 2, title: formatearTooltip(data.socrates) },
-          { from: 1, to: 3, title: formatearTooltip(data.platon) },
-          { from: 1, to: 4, title: formatearTooltip(data.aristoteles) },
-          { from: 1, to: 5, title: formatearTooltip(data.agustin) },
-          { from: 1, to: 6, title: formatearTooltip(data.descartes) },
-          { from: 1, to: 7, title: formatearTooltip(data.locke) },
-          { from: 1, to: 8, title: formatearTooltip(data.kant) },
-          { from: 1, to: 9, title: formatearTooltip(data.nietzsche) }
+          { from: 1, to: 2 }, { from: 1, to: 3 }, { from: 1, to: 4 },
+          { from: 1, to: 5 }, { from: 1, to: 6 }, { from: 1, to: 7 },
+          { from: 1, to: 8 }, { from: 1, to: 9 }
         ]);
 
         const container = document.getElementById('network');
@@ -156,9 +208,9 @@
           physics: {
             enabled: true,
             barnesHut: {
-              gravitationalConstant: -18000,
+              gravitationalConstant: -14000,
               centralGravity: 0.1,
-              springLength: 220,
+              springLength: 180,
               springConstant: 0.04
             }
           },
@@ -173,7 +225,7 @@
         network = new vis.Network(container, { nodes, edges }, options);
 
       } catch (err) {
-        console.error("Error consultando el servidor:", err);
+        console.error("Error al obtener datos:", err);
       }
     }
 
