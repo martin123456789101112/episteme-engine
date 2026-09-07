@@ -3,155 +3,42 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Episteme Engine - Red Completa de Nodos</title>
+  <title>Episteme Engine</title>
   <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
   <style>
     * { box-sizing: border-box; }
-    body { 
-      background-color: #0f172a; 
-      color: #f8fafc; 
-      font-family: system-ui, -apple-system, sans-serif; 
-      margin: 0; 
-      padding: 20px; 
-      position: relative;
-    }
-    
-    .author-badge {
-      position: absolute;
-      top: 15px;
-      right: 20px;
-      font-size: 0.8rem;
-      color: #94a3b8;
-      background: #1e293b;
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid #334155;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
+    body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; margin: 0; padding: 20px; position: relative; }
+    .author-badge { position: absolute; top: 15px; right: 20px; font-size: 0.8rem; color: #94a3b8; background: #1e293b; padding: 6px 12px; border-radius: 6px; border: 1px solid #334155; }
     h1 { text-align: center; color: #38bdf8; margin: 0 0 5px 0; font-size: 1.8rem; }
     p.subtitle { text-align: center; color: #94a3b8; margin: 0 0 20px 0; font-size: 0.95rem; }
-    
     .controls { display: flex; gap: 10px; justify-content: center; margin-bottom: 15px; }
-    input { 
-      padding: 12px 16px; 
-      width: 420px; 
-      border-radius: 6px; 
-      border: 1px solid #334155; 
-      background: #1e293b; 
-      color: white; 
-      outline: none; 
-      font-size: 0.95rem; 
-    }
-    button { 
-      padding: 12px 24px; 
-      background: #38bdf8; 
-      border: none; 
-      border-radius: 6px; 
-      font-weight: bold; 
-      cursor: pointer; 
-      color: #0f172a; 
-      font-size: 0.95rem; 
-      transition: background 0.2s; 
-    }
-    button:hover { background: #7dd3fc; }
-
-    .app-layout { 
-      display: flex; 
-      gap: 15px; 
-      width: 100%; 
-      height: 75vh; 
-    }
-
-    #network { 
-      flex: 1; 
-      border: 1px solid #334155; 
-      border-radius: 8px; 
-      background: #0b0f19; 
-      height: 100%; 
-    }
-
-    .task-panel { 
-      width: 380px; 
-      background: #1e293b; 
-      border: 1px solid #334155; 
-      border-radius: 8px; 
-      padding: 16px; 
-      display: flex; 
-      flex-direction: column; 
-      gap: 12px; 
-      overflow-y: auto; 
-    }
-
-    .task-panel h2 { 
-      color: #38bdf8; 
-      font-size: 1.1rem; 
-      margin: 0 0 8px 0; 
-      border-bottom: 1px solid #334155; 
-      padding-bottom: 8px; 
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .philosopher-card { 
-      background: #0f172a; 
-      border-left: 4px solid #38bdf8; 
-      padding: 10px 12px; 
-      border-radius: 4px; 
-      font-size: 0.85rem; 
-      line-height: 1.4; 
-    }
-    
-    .philosopher-card strong { 
-      color: #f8fafc; 
-      display: block; 
-      margin-bottom: 3px; 
-    }
-
-    div.vis-tooltip {
-      position: absolute !important;
-      background-color: #1e293b !important;
-      color: #f8fafc !important;
-      border: 1px solid #38bdf8 !important;
-      border-radius: 8px !important;
-      padding: 12px !important;
-      font-family: system-ui, sans-serif !important;
-      font-size: 0.85rem !important;
-      line-height: 1.4 !important;
-      max-width: 260px !important;
-      width: max-content !important;
-      white-space: normal !important;
-      word-break: break-word !important;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.7) !important;
-      z-index: 9999 !important;
-    }
+    input { padding: 12px 16px; width: 420px; border-radius: 6px; border: 1px solid #334155; background: #1e293b; color: white; outline: none; }
+    button { padding: 12px 24px; background: #38bdf8; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #0f172a; }
+    .app-layout { display: flex; gap: 15px; width: 100%; height: 75vh; }
+    #network { flex: 1; border: 1px solid #334155; border-radius: 8px; background: #0b0f19; height: 100%; }
+    .task-panel { width: 380px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; }
+    .task-panel h2 { color: #38bdf8; font-size: 1.1rem; margin: 0 0 8px 0; border-bottom: 1px solid #334155; padding-bottom: 8px; }
+    .philosopher-card { background: #0f172a; border-left: 4px solid #38bdf8; padding: 10px 12px; border-radius: 4px; font-size: 0.85rem; line-height: 1.4; }
+    .philosopher-card strong { color: #f8fafc; display: block; margin-bottom: 3px; }
+    div.vis-tooltip { position: absolute !important; background-color: #1e293b !important; color: #f8fafc !important; border: 1px solid #38bdf8 !important; border-radius: 8px !important; padding: 12px !important; font-size: 0.85rem !important; max-width: 260px !important; z-index: 9999 !important; }
   </style>
 </head>
 <body>
 
   <div class="author-badge">sepulveda celeita martin santiago</div>
-
   <h1>EPISTEME ENGINE</h1>
   <p class="subtitle">Simulador de la Teoría del Conocimiento mediante Nodos Interactivos</p>
 
   <div class="controls">
-    <input type="text" id="userInput" value="Veo una manzana roja en la mesa" placeholder="Escribe una percepción o premisa...">
+    <input type="text" id="userInput" value="Veo una manzana roja en la mesa">
     <button onclick="procesarEpistemologia()">Analizar en Nodos</button>
   </div>
 
   <div class="app-layout">
     <div id="network"></div>
-
     <div class="task-panel">
-      <h2>
-        Puntos de Vista
-        <span style="font-size: 0.8rem; color: #94a3b8; font-weight: normal;">(18 Filósofos)</span>
-      </h2>
-      <div id="taskContent">
-        <p style="color: #94a3b8; font-size: 0.85rem;">Cargando análisis...</p>
-      </div>
+      <h2>Puntos de Vista <span style="font-size: 0.8rem; color: #94a3b8;">(19 Filósofos)</span></h2>
+      <div id="taskContent"><p style="color: #94a3b8;">Cargando análisis...</p></div>
     </div>
   </div>
 
@@ -163,13 +50,17 @@
       container.style.maxWidth = '240px';
       container.style.whiteSpace = 'normal';
       container.style.wordWrap = 'break-word';
-      container.innerText = texto || '';
+      container.innerText = texto || 'Sin interpretación disponible.';
       return container;
     }
 
     function acortarTextoNodo(str, maxLen = 30) {
-      if (str.length <= maxLen) return str;
-      return str.substring(0, maxLen) + '...';
+      return str.length <= maxLen ? str : str.substring(0, maxLen) + '...';
+    }
+
+    function obtenerValor(obj, clave) {
+      if (!obj) return 'Análisis no disponible.';
+      return obj[clave] || obj[clave.toLowerCase()] || 'Sin datos.';
     }
 
     async function procesarEpistemologia() {
@@ -182,63 +73,62 @@
           body: JSON.stringify({ premisa })
         });
 
-        const data = await response.json();
+        const rawData = await response.json();
+        
+        // Normalizar llaves a minúsculas y sin tildes
+        const data = {};
+        Object.keys(rawData).forEach(key => {
+          const cleanKey = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          data[cleanKey] = rawData[key];
+        });
 
         const taskContent = document.getElementById('taskContent');
         taskContent.innerHTML = `
           <div class="philosopher-card" style="border-color: #f43f5e;"><strong>Premisa Analizada:</strong> "${premisa}"</div>
-          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Sócrates:</strong> ${data.socrates}</div>
-          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Platón:</strong> ${data.platon}</div>
-          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Aristóteles:</strong> ${data.aristoteles}</div>
-          <div class="philosopher-card" style="border-color: #a855f7;"><strong>San Agustín:</strong> ${data.agustin}</div>
-          <div class="philosopher-card" style="border-color: #a855f7;"><strong>Duns Escoto:</strong> ${data.escoto}</div>
-          <div class="philosopher-card" style="border-color: #a855f7;"><strong>Guillermo de Ockham:</strong> ${data.ockam}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Descartes:</strong> ${data.descartes}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Spinoza:</strong> ${data.spinoza}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Leibniz:</strong> ${data.leibniz}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Hobbes:</strong> ${data.hobbes}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Locke:</strong> ${data.locke}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Berkeley:</strong> ${data.berkeley}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Hume:</strong> ${data.hume}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Husserl:</strong> ${data.husserl}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Heidegger:</strong> ${data.heidegger}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Kant:</strong> ${data.kant}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Comte:</strong> ${data.comte}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Nietzsche:</strong> ${data.nietzsche}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Weber:</strong> ${data.weber}</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Sócrates:</strong> ${obtenerValor(data, 'socrates')}</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Platón:</strong> ${obtenerValor(data, 'platon')}</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Aristóteles:</strong> ${obtenerValor(data, 'aristoteles')}</div>
+          <div class="philosopher-card" style="border-color: #a855f7;"><strong>San Agustín:</strong> ${obtenerValor(data, 'agustin')}</div>
+          <div class="philosopher-card" style="border-color: #a855f7;"><strong>Duns Escoto:</strong> ${obtenerValor(data, 'escoto')}</div>
+          <div class="philosopher-card" style="border-color: #a855f7;"><strong>Guillermo de Ockham:</strong> ${obtenerValor(data, 'ockam')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Descartes:</strong> ${obtenerValor(data, 'descartes')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Spinoza:</strong> ${obtenerValor(data, 'spinoza')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Leibniz:</strong> ${obtenerValor(data, 'leibniz')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Hobbes:</strong> ${obtenerValor(data, 'hobbes')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Locke:</strong> ${obtenerValor(data, 'locke')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Berkeley:</strong> ${obtenerValor(data, 'berkeley')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Hume:</strong> ${obtenerValor(data, 'hume')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Husserl:</strong> ${obtenerValor(data, 'husserl')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Heidegger:</strong> ${obtenerValor(data, 'heidegger')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Kant:</strong> ${obtenerValor(data, 'kant')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Comte:</strong> ${obtenerValor(data, 'comte')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Nietzsche:</strong> ${obtenerValor(data, 'nietzsche')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Max Weber:</strong> ${obtenerValor(data, 'weber')}</div>
         `;
 
         const labelCentro = 'PREMISA:\n' + acortarTextoNodo(premisa, 30);
 
         const nodes = new vis.DataSet([
-          { id: 1, label: labelCentro, title: formatearTooltip("Premisa:\n" + premisa), color: { background: '#f43f5e', border: '#fda4af' }, shape: 'box', margin: 12, shapeProperties: { borderRadius: 8 }, font: { color: '#ffffff', size: 13, bold: true, align: 'center' } },
-          
-          // Antigua
-          { id: 2, label: 'Sócrates', title: formatearTooltip(data.socrates), color: '#38bdf8', font: { color: '#ffffff' } },
-          { id: 3, label: 'Platón', title: formatearTooltip(data.platon), color: '#38bdf8', font: { color: '#ffffff' } },
-          { id: 4, label: 'Aristóteles', title: formatearTooltip(data.aristoteles), color: '#38bdf8', font: { color: '#ffffff' } },
-          
-          // Medieval
-          { id: 5, label: 'San Agustín', title: formatearTooltip(data.agustin), color: '#a855f7', font: { color: '#ffffff' } },
-          { id: 6, label: 'Duns Escoto', title: formatearTooltip(data.escoto), color: '#a855f7', font: { color: '#ffffff' } },
-          { id: 7, label: 'G. de Ockham', title: formatearTooltip(data.ockam), color: '#a855f7', font: { color: '#ffffff' } },
-          
-          // Moderna
-          { id: 8, label: 'Descartes', title: formatearTooltip(data.descartes), color: '#f59e0b', font: { color: '#ffffff' } },
-          { id: 9, label: 'Spinoza', title: formatearTooltip(data.spinoza), color: '#f59e0b', font: { color: '#ffffff' } },
-          { id: 10, label: 'Leibniz', title: formatearTooltip(data.leibniz), color: '#f59e0b', font: { color: '#ffffff' } },
-          { id: 11, label: 'Hobbes', title: formatearTooltip(data.hobbes), color: '#f59e0b', font: { color: '#ffffff' } },
-          { id: 12, label: 'Locke', title: formatearTooltip(data.locke), color: '#f59e0b', font: { color: '#ffffff' } },
-          { id: 13, label: 'Berkeley', title: formatearTooltip(data.berkeley), color: '#f59e0b', font: { color: '#ffffff' } },
-          { id: 14, label: 'Hume', title: formatearTooltip(data.hume), color: '#f59e0b', font: { color: '#ffffff' } },
-          
-          // Contemporánea
-          { id: 15, label: 'Husserl', title: formatearTooltip(data.husserl), color: '#10b981', font: { color: '#ffffff' } },
-          { id: 16, label: 'Heidegger', title: formatearTooltip(data.heidegger), color: '#10b981', font: { color: '#ffffff' } },
-          { id: 17, label: 'Kant', title: formatearTooltip(data.kant), color: '#10b981', font: { color: '#ffffff' } },
-          { id: 18, label: 'Comte', title: formatearTooltip(data.comte), color: '#10b981', font: { color: '#ffffff' } },
-          { id: 19, label: 'Nietzsche', title: formatearTooltip(data.nietzsche), color: '#10b981', font: { color: '#ffffff' } },
-          { id: 20, label: 'Weber', title: formatearTooltip(data.weber), color: '#10b981', font: { color: '#ffffff' } }
+          { id: 1, label: labelCentro, title: formatearTooltip("Premisa:\n" + premisa), color: { background: '#f43f5e', border: '#fda4af' }, shape: 'box', margin: 12 },
+          { id: 2, label: 'Sócrates', title: formatearTooltip(obtenerValor(data, 'socrates')), color: '#38bdf8' },
+          { id: 3, label: 'Platón', title: formatearTooltip(obtenerValor(data, 'platon')), color: '#38bdf8' },
+          { id: 4, label: 'Aristóteles', title: formatearTooltip(obtenerValor(data, 'aristoteles')), color: '#38bdf8' },
+          { id: 5, label: 'San Agustín', title: formatearTooltip(obtenerValor(data, 'agustin')), color: '#a855f7' },
+          { id: 6, label: 'Duns Escoto', title: formatearTooltip(obtenerValor(data, 'escoto')), color: '#a855f7' },
+          { id: 7, label: 'G. de Ockham', title: formatearTooltip(obtenerValor(data, 'ockam')), color: '#a855f7' },
+          { id: 8, label: 'Descartes', title: formatearTooltip(obtenerValor(data, 'descartes')), color: '#f59e0b' },
+          { id: 9, label: 'Spinoza', title: formatearTooltip(obtenerValor(data, 'spinoza')), color: '#f59e0b' },
+          { id: 10, label: 'Leibniz', title: formatearTooltip(obtenerValor(data, 'leibniz')), color: '#f59e0b' },
+          { id: 11, label: 'Hobbes', title: formatearTooltip(obtenerValor(data, 'hobbes')), color: '#f59e0b' },
+          { id: 12, label: 'Locke', title: formatearTooltip(obtenerValor(data, 'locke')), color: '#f59e0b' },
+          { id: 13, label: 'Berkeley', title: formatearTooltip(obtenerValor(data, 'berkeley')), color: '#f59e0b' },
+          { id: 14, label: 'Hume', title: formatearTooltip(obtenerValor(data, 'hume')), color: '#f59e0b' },
+          { id: 15, label: 'Husserl', title: formatearTooltip(obtenerValor(data, 'husserl')), color: '#10b981' },
+          { id: 16, label: 'Heidegger', title: formatearTooltip(obtenerValor(data, 'heidegger')), color: '#10b981' },
+          { id: 17, label: 'Kant', title: formatearTooltip(obtenerValor(data, 'kant')), color: '#10b981' },
+          { id: 18, label: 'Comte', title: formatearTooltip(obtenerValor(data, 'comte')), color: '#10b981' },
+          { id: 19, label: 'Nietzsche', title: formatearTooltip(obtenerValor(data, 'nietzsche')), color: '#10b981' },
+          { id: 20, label: 'Weber', title: formatearTooltip(obtenerValor(data, 'weber')), color: '#10b981' }
         ]);
 
         const edges = new vis.DataSet([
@@ -252,24 +142,14 @@
         ]);
 
         const container = document.getElementById('network');
-
         if (network !== null) { network.destroy(); }
 
         const options = {
           physics: {
             enabled: true,
-            barnesHut: {
-              gravitationalConstant: -35000,
-              centralGravity: 0.1,
-              springLength: 260,
-              springConstant: 0.03
-            }
+            barnesHut: { gravitationalConstant: -38000, centralGravity: 0.1, springLength: 280, springConstant: 0.03 }
           },
-          edges: {
-            color: { color: '#38bdf8', highlight: '#7dd3fc' },
-            width: 1.5,
-            smooth: { type: 'continuous' }
-          },
+          edges: { color: { color: '#38bdf8' }, width: 1.5 },
           interaction: { hover: true }
         };
 
