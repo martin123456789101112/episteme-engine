@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Episteme Engine</title>
-  <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <script type="text/javascript" src="[https://unpkg.com/vis-network/standalone/umd/vis-network.min.js](https://unpkg.com/vis-network/standalone/umd/vis-network.min.js)"></script>
   <style>
     * { box-sizing: border-box; }
     body { background-color: #0f172a; color: #f8fafc; font-family: system-ui, sans-serif; margin: 0; padding: 20px; position: relative; }
@@ -50,17 +50,12 @@
       container.style.maxWidth = '240px';
       container.style.whiteSpace = 'normal';
       container.style.wordWrap = 'break-word';
-      container.innerText = texto || 'Sin interpretación disponible.';
+      container.innerText = texto || 'Cargando...';
       return container;
     }
 
     function acortarTextoNodo(str, maxLen = 30) {
       return str.length <= maxLen ? str : str.substring(0, maxLen) + '...';
-    }
-
-    function obtenerValor(obj, clave) {
-      if (!obj) return 'Análisis no disponible.';
-      return obj[clave] || obj[clave.toLowerCase()] || 'Sin datos.';
     }
 
     async function procesarEpistemologia() {
@@ -74,61 +69,63 @@
         });
 
         const rawData = await response.json();
-        
-        // Normalizar llaves a minúsculas y sin tildes
+
+        // Normalización automática de claves
         const data = {};
         Object.keys(rawData).forEach(key => {
-          const cleanKey = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+          const cleanKey = key.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
           data[cleanKey] = rawData[key];
         });
+
+        const getVal = (k) => data[k] || 'Sin análisis generado.';
 
         const taskContent = document.getElementById('taskContent');
         taskContent.innerHTML = `
           <div class="philosopher-card" style="border-color: #f43f5e;"><strong>Premisa Analizada:</strong> "${premisa}"</div>
-          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Sócrates:</strong> ${obtenerValor(data, 'socrates')}</div>
-          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Platón:</strong> ${obtenerValor(data, 'platon')}</div>
-          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Aristóteles:</strong> ${obtenerValor(data, 'aristoteles')}</div>
-          <div class="philosopher-card" style="border-color: #a855f7;"><strong>San Agustín:</strong> ${obtenerValor(data, 'agustin')}</div>
-          <div class="philosopher-card" style="border-color: #a855f7;"><strong>Duns Escoto:</strong> ${obtenerValor(data, 'escoto')}</div>
-          <div class="philosopher-card" style="border-color: #a855f7;"><strong>Guillermo de Ockham:</strong> ${obtenerValor(data, 'ockam')}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Descartes:</strong> ${obtenerValor(data, 'descartes')}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Spinoza:</strong> ${obtenerValor(data, 'spinoza')}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Leibniz:</strong> ${obtenerValor(data, 'leibniz')}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Hobbes:</strong> ${obtenerValor(data, 'hobbes')}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Locke:</strong> ${obtenerValor(data, 'locke')}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Berkeley:</strong> ${obtenerValor(data, 'berkeley')}</div>
-          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Hume:</strong> ${obtenerValor(data, 'hume')}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Husserl:</strong> ${obtenerValor(data, 'husserl')}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Heidegger:</strong> ${obtenerValor(data, 'heidegger')}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Kant:</strong> ${obtenerValor(data, 'kant')}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Comte:</strong> ${obtenerValor(data, 'comte')}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Nietzsche:</strong> ${obtenerValor(data, 'nietzsche')}</div>
-          <div class="philosopher-card" style="border-color: #10b981;"><strong>Max Weber:</strong> ${obtenerValor(data, 'weber')}</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Sócrates:</strong> ${getVal('socrates')}</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Platón:</strong> ${getVal('platon')}</div>
+          <div class="philosopher-card" style="border-color: #38bdf8;"><strong>Aristóteles:</strong> ${getVal('aristoteles')}</div>
+          <div class="philosopher-card" style="border-color: #a855f7;"><strong>San Agustín:</strong> ${getVal('agustin')}</div>
+          <div class="philosopher-card" style="border-color: #a855f7;"><strong>Duns Escoto:</strong> ${getVal('escoto')}</div>
+          <div class="philosopher-card" style="border-color: #a855f7;"><strong>Guillermo de Ockham:</strong> ${getVal('ockam')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Descartes:</strong> ${getVal('descartes')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Spinoza:</strong> ${getVal('spinoza')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Leibniz:</strong> ${getVal('leibniz')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Hobbes:</strong> ${getVal('hobbes')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Locke:</strong> ${getVal('locke')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Berkeley:</strong> ${getVal('berkeley')}</div>
+          <div class="philosopher-card" style="border-color: #f59e0b;"><strong>Hume:</strong> ${getVal('hume')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Husserl:</strong> ${getVal('husserl')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Heidegger:</strong> ${getVal('heidegger')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Kant:</strong> ${getVal('kant')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Comte:</strong> ${getVal('comte')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Nietzsche:</strong> ${getVal('nietzsche')}</div>
+          <div class="philosopher-card" style="border-color: #10b981;"><strong>Max Weber:</strong> ${getVal('weber')}</div>
         `;
 
         const labelCentro = 'PREMISA:\n' + acortarTextoNodo(premisa, 30);
 
         const nodes = new vis.DataSet([
           { id: 1, label: labelCentro, title: formatearTooltip("Premisa:\n" + premisa), color: { background: '#f43f5e', border: '#fda4af' }, shape: 'box', margin: 12 },
-          { id: 2, label: 'Sócrates', title: formatearTooltip(obtenerValor(data, 'socrates')), color: '#38bdf8' },
-          { id: 3, label: 'Platón', title: formatearTooltip(obtenerValor(data, 'platon')), color: '#38bdf8' },
-          { id: 4, label: 'Aristóteles', title: formatearTooltip(obtenerValor(data, 'aristoteles')), color: '#38bdf8' },
-          { id: 5, label: 'San Agustín', title: formatearTooltip(obtenerValor(data, 'agustin')), color: '#a855f7' },
-          { id: 6, label: 'Duns Escoto', title: formatearTooltip(obtenerValor(data, 'escoto')), color: '#a855f7' },
-          { id: 7, label: 'G. de Ockham', title: formatearTooltip(obtenerValor(data, 'ockam')), color: '#a855f7' },
-          { id: 8, label: 'Descartes', title: formatearTooltip(obtenerValor(data, 'descartes')), color: '#f59e0b' },
-          { id: 9, label: 'Spinoza', title: formatearTooltip(obtenerValor(data, 'spinoza')), color: '#f59e0b' },
-          { id: 10, label: 'Leibniz', title: formatearTooltip(obtenerValor(data, 'leibniz')), color: '#f59e0b' },
-          { id: 11, label: 'Hobbes', title: formatearTooltip(obtenerValor(data, 'hobbes')), color: '#f59e0b' },
-          { id: 12, label: 'Locke', title: formatearTooltip(obtenerValor(data, 'locke')), color: '#f59e0b' },
-          { id: 13, label: 'Berkeley', title: formatearTooltip(obtenerValor(data, 'berkeley')), color: '#f59e0b' },
-          { id: 14, label: 'Hume', title: formatearTooltip(obtenerValor(data, 'hume')), color: '#f59e0b' },
-          { id: 15, label: 'Husserl', title: formatearTooltip(obtenerValor(data, 'husserl')), color: '#10b981' },
-          { id: 16, label: 'Heidegger', title: formatearTooltip(obtenerValor(data, 'heidegger')), color: '#10b981' },
-          { id: 17, label: 'Kant', title: formatearTooltip(obtenerValor(data, 'kant')), color: '#10b981' },
-          { id: 18, label: 'Comte', title: formatearTooltip(obtenerValor(data, 'comte')), color: '#10b981' },
-          { id: 19, label: 'Nietzsche', title: formatearTooltip(obtenerValor(data, 'nietzsche')), color: '#10b981' },
-          { id: 20, label: 'Weber', title: formatearTooltip(obtenerValor(data, 'weber')), color: '#10b981' }
+          { id: 2, label: 'Sócrates', title: formatearTooltip(getVal('socrates')), color: '#38bdf8' },
+          { id: 3, label: 'Platón', title: formatearTooltip(getVal('platon')), color: '#38bdf8' },
+          { id: 4, label: 'Aristóteles', title: formatearTooltip(getVal('aristoteles')), color: '#38bdf8' },
+          { id: 5, label: 'San Agustín', title: formatearTooltip(getVal('agustin')), color: '#a855f7' },
+          { id: 6, label: 'Duns Escoto', title: formatearTooltip(getVal('escoto')), color: '#a855f7' },
+          { id: 7, label: 'G. de Ockham', title: formatearTooltip(getVal('ockam')), color: '#a855f7' },
+          { id: 8, label: 'Descartes', title: formatearTooltip(getVal('descartes')), color: '#f59e0b' },
+          { id: 9, label: 'Spinoza', title: formatearTooltip(getVal('spinoza')), color: '#f59e0b' },
+          { id: 10, label: 'Leibniz', title: formatearTooltip(getVal('leibniz')), color: '#f59e0b' },
+          { id: 11, label: 'Hobbes', title: formatearTooltip(getVal('hobbes')), color: '#f59e0b' },
+          { id: 12, label: 'Locke', title: formatearTooltip(getVal('locke')), color: '#f59e0b' },
+          { id: 13, label: 'Berkeley', title: formatearTooltip(getVal('berkeley')), color: '#f59e0b' },
+          { id: 14, label: 'Hume', title: formatearTooltip(getVal('hume')), color: '#f59e0b' },
+          { id: 15, label: 'Husserl', title: formatearTooltip(getVal('husserl')), color: '#10b981' },
+          { id: 16, label: 'Heidegger', title: formatearTooltip(getVal('heidegger')), color: '#10b981' },
+          { id: 17, label: 'Kant', title: formatearTooltip(getVal('kant')), color: '#10b981' },
+          { id: 18, label: 'Comte', title: formatearTooltip(getVal('comte')), color: '#10b981' },
+          { id: 19, label: 'Nietzsche', title: formatearTooltip(getVal('nietzsche')), color: '#10b981' },
+          { id: 20, label: 'Weber', title: formatearTooltip(getVal('weber')), color: '#10b981' }
         ]);
 
         const edges = new vis.DataSet([
