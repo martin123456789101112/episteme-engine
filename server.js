@@ -1,38 +1,82 @@
-const express = require('express');
-const cors = require('cors');
-const path = require('path');
+import express from 'express';
+import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
+
+dotenv.config();
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 app.use(express.json());
-
-// Servir la interfaz del frontend desde la carpeta 'public'
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Ruta de salud usada para UptimeRobot
-app.get('/health', (req, res) => {
-  res.status(200).send('Servidor activo 24/7');
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// Endpoint que responde la tarea analizada por filósofos
-app.post('/api/analizar', (req, res) => {
+app.post('/api/analizar', async (req, res) => {
   const { premisa } = req.body;
-  const texto = premisa || "la realidad";
 
-  res.json({
-    socrates: `Sócrates: ¿Estás seguro de que entiendes "${texto}"? Cuestiónalo mediante la mayéutica.`,
-    platon: `Platón: "${texto}" en el mundo físico es solo una sombra. El verdadero conocimiento de su idea está en el alma.`,
-    aristoteles: `Aristóteles: Tu conocimiento de "${texto}" inició en tus sentidos y luego tu mente abstrajo su esencia.`,
-    agustin: `San Agustín: Para comprender las verdades sobre "${texto}" requieres de la Iluminación Divina.`,
-    descartes: `Descartes: Dudas de tus sentidos sobre "${texto}". La única certeza indudable es que estás pensándolo.`,
-    locke: `Locke: Naciendo con mente en blanco, la experiencia y sensación grabaron "${texto}" en tu tabla rasa.`,
-    kant: `Kant: Percibiste datos de "${texto}", pero las formas a priori (espacio/tiempo) de tu mente los organizaron.`,
-    nietzsche: `Nietzsche: "${texto}" no es una verdad objetiva; es una interpretación creada por tu voluntad de poder.`
-  });
+  if (!premisa) {
+    return res.status(400).json({ error: 'La premisa es requerida.' });
+  }
+
+  try {
+    const model = genAI.getGenerativeModel({
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            socrates: { type: SchemaType.STRING },
+            platon: { type: SchemaType.STRING },
+            aristoteles: { type: SchemaType.STRING },
+            agustin: { type: SchemaType.STRING },
+            escoto: { type: SchemaType.STRING },
+            ockam: { type: SchemaType.STRING },
+            descartes: { type: SchemaType.STRING },
+            spinoza: { type: SchemaType.STRING },
+            leibniz: { type: SchemaType.STRING },
+            hobbes: { type: SchemaType.STRING },
+            locke: { type: SchemaType.STRING },
+            berkeley: { type: SchemaType.STRING },
+            hume: { type: SchemaType.STRING },
+            husserl: { type: SchemaType.STRING },
+            heidegger: { type: SchemaType.STRING },
+            kant: { type: SchemaType.STRING },
+            comte: { type: SchemaType.STRING },
+            nietzsche: { type: SchemaType.STRING },
+            weber: { type: SchemaType.STRING }
+          },
+          required: [
+            'socrates', 'platon', 'aristoteles', 'agustin', 'escoto', 'ockam',
+            'descartes', 'spinoza', 'leibniz', 'hobbes', 'locke', 'berkeley',
+            'hume', 'husserl', 'heidegger', 'kant', 'comte', 'nietzsche', 'weber'
+          ]
+        }
+      }
+    });
+
+    const promptSystem = `
+Actúa como un motor epistemológico. Analiza la siguiente premisa: "${premisa}".
+Genera una explicación breve (1 o 2 frases) de cómo interpreta esta premisa cada uno de los 19 filósofos desde su postura filosófica.
+`;
+
+    const result = await model.generateContent(promptSystem);
+    const data = JSON.parse(result.response.text());
+
+    res.json(data);
+
+  } catch (error) {
+    console.error('Error en el servidor:', error);
+    res.status(500).json({ error: 'Error al procesar el análisis.' });
+  }
 });
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Servidor ejecutándose en el puerto ${PORT}`);
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
