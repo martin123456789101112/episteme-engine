@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Base de datos epistemológica con la doctrina exacta provista
+// Base de datos epistemológica completa con los 19 filósofos
 const BASE_EPISTEMOLOGICA = {
   socrates: "El conocimiento se alcanza reconociendo la propia ignorancia ('solo sé que nada sé') a través del diálogo dialéctico y la mayéutica para descubrir verdades universales e inherentes a la razón humana.",
   platon: "El conocimiento auténtico (episteme) es el recuerdo o aprehensión del Mundo de las Ideas (eternas, inmutables y perfectas), accesible solo por la razón, diferenciándolo de la opinión (doxa) basada en el mundo sensible.",
@@ -30,7 +30,7 @@ const BASE_EPISTEMOLOGICA = {
   berkeley: "Plantea el inmaterialismo (esse est percipi), donde el conocimiento se reduce a las percepciones e ideas que Dios infunde directamente en la mente humana.",
   hume: "El conocimiento surge de las impresiones y las ideas; reduce las leyes de causa y efecto a hábitos psicológicos basados en la asociación y la costumbre.",
   kant: "El conocimiento es una síntesis entre el material de la experiencia sensible y las formas a priori (espacio, tiempo y categorías) estructuradas por el entendimiento humano.",
-  husserl: "Funda la fenomenología, definiendo el conocimiento como la intuición directa y la descripción rigurosa de las esencias de los fenómenos tal como se presentan a la conciencia.",
+  husserl: "Funda la fenomenología, defining el conocimiento como la intuición directa y la descripción rigurosa de las esencias de los fenómenos tal como se presentan a la conciencia.",
   heidegger: "Concibe el conocimiento no como una mera relación sujeto-objeto, sino como una modalidad del 'estar-en-el-mundo' (Dasein) vinculada a la comprensión existencial y al sentido del Ser.",
   comte: "Establece el positivismo, donde el conocimiento válido se limita a los hechos observables y sus leyes científicas comprobables, descartando las explicaciones metafísicas.",
   nietzsche: "Rechaza la existencia de una verdad o conocimiento objetivo; sostiene un perspectivismo donde las verdades son construcciones interpretativas subordinadas a la voluntad de poder.",
@@ -44,7 +44,6 @@ app.post('/api/analizar', (req, res) => {
     return res.status(400).json({ error: 'La premisa es requerida.' });
   }
 
-  // Generación instantánea adaptando la premisa recibida a la postura de cada filósofo
   const respuestaFormat = {};
   for (const [key, doctrina] of Object.entries(BASE_EPISTEMOLOGICA)) {
     respuestaFormat[key] = `Ante '${premisa}': ${doctrina}`;
@@ -54,5 +53,5 @@ app.post('/api/analizar', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor activo en http://localhost:${PORT}`);
+  console.log(`Servidor activo en el puerto ${PORT}`);
 });
