@@ -2,7 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai';
 
 dotenv.config();
 
@@ -28,38 +28,43 @@ app.post('/api/analizar', async (req, res) => {
     const model = genAI.getGenerativeModel({
       model: 'gemini-1.5-flash',
       generationConfig: {
-        responseMimeType: 'application/json'
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: SchemaType.OBJECT,
+          properties: {
+            socrates: { type: SchemaType.STRING },
+            platon: { type: SchemaType.STRING },
+            aristoteles: { type: SchemaType.STRING },
+            agustin: { type: SchemaType.STRING },
+            escoto: { type: SchemaType.STRING },
+            ockam: { type: SchemaType.STRING },
+            descartes: { type: SchemaType.STRING },
+            spinoza: { type: SchemaType.STRING },
+            leibniz: { type: SchemaType.STRING },
+            hobbes: { type: SchemaType.STRING },
+            locke: { type: SchemaType.STRING },
+            berkeley: { type: SchemaType.STRING },
+            hume: { type: SchemaType.STRING },
+            husserl: { type: SchemaType.STRING },
+            heidegger: { type: SchemaType.STRING },
+            kant: { type: SchemaType.STRING },
+            comte: { type: SchemaType.STRING },
+            nietzsche: { type: SchemaType.STRING },
+            weber: { type: SchemaType.STRING }
+          },
+          required: [
+            "socrates", "platon", "aristoteles", "agustin", "escoto", 
+            "ockam", "descartes", "spinoza", "leibniz", "hobbes", 
+            "locke", "berkeley", "hume", "husserl", "heidegger", 
+            "kant", "comte", "nietzsche", "weber"
+          ]
+        }
       }
     });
 
     const promptSystem = `
-Actúa como un motor epistemológico interactivo. Interpreta la siguiente premisa ingresada por el usuario: "${premisa}".
-
-Tu tarea es hacer que cada uno de los 19 filósofos reaccione e interprete esta premisa en 1 o 2 frases concisas y directas.
-
-Devuelve UNICAMENTE un objeto JSON donde cada clave sea el ID del filósofo exacto:
-
-{
-  "socrates": "...",
-  "platon": "...",
-  "aristoteles": "...",
-  "agustin": "...",
-  "escoto": "...",
-  "ockam": "...",
-  "descartes": "...",
-  "spinoza": "...",
-  "leibniz": "...",
-  "hobbes": "...",
-  "locke": "...",
-  "berkeley": "...",
-  "hume": "...",
-  "husserl": "...",
-  "heidegger": "...",
-  "kant": "...",
-  "comte": "...",
-  "nietzsche": "...",
-  "weber": "..."
-}
+Actúa como un motor epistemológico. Interpreta la premisa: "${premisa}".
+Entrega para cada filósofo una interpretación directa en 1 o 2 frases concisas.
 `;
 
     const result = await model.generateContent(promptSystem);
@@ -70,10 +75,10 @@ Devuelve UNICAMENTE un objeto JSON donde cada clave sea el ID del filósofo exac
 
   } catch (error) {
     console.error('Error al generar análisis:', error);
-    res.status(500).json({ error: 'Ocurrió un error al procesar el análisis.' });
+    res.status(500).json({ error: 'Error interno al procesar el análisis.' });
   }
 });
 
 app.listen(PORT, () => {
-  console.log(`Servidor corriendo en el puerto ${PORT}`);
+  console.log(`Servidor en puerto ${PORT}`);
 });
